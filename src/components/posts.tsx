@@ -5,7 +5,6 @@ const Posts = () => {
     const { status, data, error } = usePosts()
 
     if (status === 'loading') return <>Loading...</>
-
     if (error instanceof Error) return <span>Error: {error.message}</span>
 
     return (

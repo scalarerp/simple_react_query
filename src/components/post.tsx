@@ -1,15 +1,9 @@
-import { useSnapshot } from 'valtio'
 import { usePost } from '../service/post'
-import { handleChangePostId, store } from '../store'
+import { handleChangePostId } from '../store'
 
 const Post = () => {
-    const { postId } = useSnapshot(store)
-    console.log('post with actual ID>', postId)
-
-    const { status, data, error } = usePost(postId)
-
+    const { status, data, error } = usePost()
     if (status === 'loading') return <>Loading...</>
-    // if (isFetching) return 'Background Updating...'
     if (error instanceof Error) return <span>Error: {error.message}</span>
 
     return (

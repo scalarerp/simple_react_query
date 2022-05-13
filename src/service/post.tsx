@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query'
 import axios from 'axios'
-import { queryClient } from '../App'
+import { store } from '../store'
 
 export interface Post {
     id: number
@@ -15,38 +15,28 @@ export interface ActualPost {
 export const postKeys = {
     posts: 'posts',
     post: 'post',
-    actualPost: 'actualPost',
 }
 
 export const usePosts = () => {
     return useQuery(postKeys.posts, async () => await apiGetPosts())
 }
 
-export const usePost = (id: number = 0) => {
-    return useQuery([postKeys.post, id], async () => await apiGetPostById(id), {
-        enabled: id > 0,
-    })
+export const usePost = () => {
+    const storePostId = store.postId
+    return useQuery(
+        [postKeys.post, storePostId],
+        async () => await apiGetPostById(),
+        {
+            enabled: storePostId > 0,
+        }
+    )
 }
 
-export const resetPost = (id: number) => {
-    queryClient.invalidateQueries([postKeys.post, id])
-}
-
-export const getQueryPost = (id: number) => {
-    return queryClient.getQueryData<Post>([postKeys.post, id])
-}
-
-export const getQueryActualPost = () => {
-    return queryClient.getQueryData<number>(postKeys.actualPost)
-}
-export const setQueryActualPost = (id: number) => {
-    return queryClient.setQueryData(postKeys.actualPost, id)
-}
-
-export const apiGetPostById = async (id: number): Promise<Post> => {
-    console.log('apiCall  POST', id)
+export const apiGetPostById = async (): Promise<Post> => {
+    const storePostId = store.postId
+    console.log('apiCall  POST ID:', storePostId)
     const { data } = await axios.get(
-        `https://jsonplaceholder.typicode.com/posts/${id}`
+        `https://jsonplaceholder.typicode.com/posts/${storePostId}`
     )
     return data
 }
