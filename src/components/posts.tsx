@@ -1,52 +1,29 @@
-import { useQueryClient } from 'react-query'
+import { handleChangePostId } from '../store'
 import { usePosts } from '../service/post'
 
-interface Props {
-    setPostId: Function
-    actualId?: number
-}
+const Posts = () => {
+    const { status, data, error } = usePosts()
 
-const Posts = ({ setPostId, actualId }: Props) => {
-    const { status, data, error, isFetching } = usePosts()
+    if (status === 'loading') return <>Loading...</>
+
+    if (error instanceof Error) return <span>Error: {error.message}</span>
 
     return (
         <div>
-            <h1>Posts</h1>
-            <div>
-                {status === 'loading' ? (
-                    'Loading...'
-                ) : error instanceof Error ? (
-                    <span>Error: {error.message}</span>
-                ) : (
-                    <>
-                        <div>
-                            {data?.map((post) => (
-                                <p key={post.id}>
-                                    <a
-                                        onClick={() => setPostId(post.id)}
-                                        href="#"
-                                        style={
-                                            // We can access the query data here
-                                            // to show bold links for
-                                            // ones that are cached
-                                            actualId === post.id
-                                                ? {
-                                                      fontWeight: 'bold',
-                                                      color: 'green',
-                                                  }
-                                                : {}
-                                        }
-                                    >
-                                        {post.id}
-                                        {' - '} {post.title}
-                                    </a>
-                                </p>
-                            ))}
-                        </div>
-                        <div>{isFetching ? 'Background Updating...' : ' '}</div>
-                    </>
-                )}
-            </div>
+            {data?.map((post) => (
+                <p key={post.id}>
+                    <a
+                        onClick={() => {
+                            // setQueryActualPost(post.id)
+                            handleChangePostId(post.id)
+                        }}
+                        href="#"
+                    >
+                        {post.id}
+                        {' - '} {post.title}
+                    </a>
+                </p>
+            ))}
         </div>
     )
 }

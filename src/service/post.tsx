@@ -19,13 +19,17 @@ export const postKeys = {
 }
 
 export const usePosts = () => {
-    return useQuery(postKeys.posts, () => apiGetPosts())
+    return useQuery(postKeys.posts, async () => await apiGetPosts())
 }
 
-export const usePost = (id: number) => {
-    return useQuery([postKeys.post, id], () => apiGetPostById(id), {
-        enabled: !!id,
+export const usePost = (id: number = 0) => {
+    return useQuery([postKeys.post, id], async () => await apiGetPostById(id), {
+        enabled: id > 0,
     })
+}
+
+export const resetPost = (id: number) => {
+    queryClient.invalidateQueries([postKeys.post, id])
 }
 
 export const getQueryPost = (id: number) => {
@@ -40,6 +44,7 @@ export const setQueryActualPost = (id: number) => {
 }
 
 export const apiGetPostById = async (id: number): Promise<Post> => {
+    console.log('apiCall  POST', id)
     const { data } = await axios.get(
         `https://jsonplaceholder.typicode.com/posts/${id}`
     )
@@ -47,6 +52,7 @@ export const apiGetPostById = async (id: number): Promise<Post> => {
 }
 
 export const apiGetPosts = async (): Promise<Post[]> => {
+    console.log('apiCall  POSTS')
     const { data } = await axios.get(
         `https://jsonplaceholder.typicode.com/posts`
     )

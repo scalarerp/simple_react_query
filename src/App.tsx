@@ -1,44 +1,35 @@
-import { useEffect, useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 
+import { store } from './store'
+
 import Post from './components/post'
 import Posts from './components/posts'
-import { getQueryActualPost, setQueryActualPost } from './service/post'
+import { useSnapshot } from 'valtio'
 
-export const queryClient = new QueryClient()
+export const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            notifyOnChangeProps: 'tracked',
+        },
+    },
+})
 
 const App = () => {
-    //only to reload the page
-    const [first, setFirst] = useState(-1)
-
-    //get Id from  react-query State
-    const postId = getQueryActualPost()
-
-    const setPostId = (id: number) => {
-        console.log('setPostId', id)
-        console.log('teste getActualPostQuery', setQueryActualPost(id))
-
-        //reload the page
-        setFirst(id)
-    }
-
-    //only for log
-    // useEffect(() => {
-    //     console.log('postId changed', postId)
-    // }, [postId])
+    const { postId } = useSnapshot(store)
 
     return (
         <QueryClientProvider client={queryClient}>
             <div className="m-2 flex flex-row">
-                <div className="p-4">
-                    <Posts setPostId={setPostId} actualId={postId} />
-                </div>
-                <div className="p-4">
-                    {postId && postId > 0 && (
-                        <Post postId={postId} setPostId={setPostId} />
-                    )}
-                </div>
+                {postId === 0 ? (
+                    <div className="p-4">
+                        <Posts />
+                    </div>
+                ) : (
+                    <div className="p-4">
+                        <Post />
+                    </div>
+                )}
             </div>
 
             <ReactQueryDevtools initialIsOpen />

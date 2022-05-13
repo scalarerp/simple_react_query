@@ -1,37 +1,31 @@
-import { getQueryActualPost, usePost } from '../service/post'
+import { useSnapshot } from 'valtio'
+import { usePost } from '../service/post'
+import { handleChangePostId, store } from '../store'
 
-interface Props {
-    postId: number
-    setPostId: Function
-}
+const Post = () => {
+    const { postId } = useSnapshot(store)
+    console.log('post with actual ID>', postId)
 
-const Post = ({ postId, setPostId }: Props) => {
-    const { status, data, error, isFetching } = usePost(postId)
+    const { status, data, error } = usePost(postId)
 
-    const PostI = getQueryActualPost()
+    if (status === 'loading') return <>Loading...</>
+    // if (isFetching) return 'Background Updating...'
+    if (error instanceof Error) return <span>Error: {error.message}</span>
 
     return (
         <div>
             <div>
-                <a onClick={() => setPostId(-1)} href="#">
+                <a onClick={() => handleChangePostId(0)} href="#">
                     Back
                 </a>
             </div>
-            {!postId || status === 'loading' ? (
-                'Loading...'
-            ) : error instanceof Error ? (
-                <span>Error: {error.message}</span>
-            ) : (
-                <>
-                    <h1>
-                        {data?.id} {' - '} {data?.title}
-                    </h1>
-                    <div>
-                        <p>{data?.body}</p>
-                    </div>
-                    <div>{isFetching ? 'Background Updating...' : ' '}</div>
-                </>
-            )}
+
+            <h1>
+                {data?.id} {' - '} {data?.title}
+            </h1>
+            <div>
+                <p>{data?.body}</p>
+            </div>
         </div>
     )
 }
