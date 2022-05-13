@@ -6,6 +6,7 @@ import { store } from './store'
 import Post from './components/post'
 import Posts from './components/posts'
 import { useSnapshot } from 'valtio'
+import React from 'react'
 
 export const queryClient = new QueryClient({
     defaultOptions: {
@@ -14,6 +15,12 @@ export const queryClient = new QueryClient({
         },
     },
 })
+
+const ReactQueryDevtoolsProduction = React.lazy(() =>
+    import('react-query/devtools/development').then((d) => ({
+        default: d.ReactQueryDevtools,
+    }))
+)
 
 const App = () => {
     const { postId } = useSnapshot(store)
@@ -32,7 +39,10 @@ const App = () => {
                 )}
             </div>
 
-            <ReactQueryDevtools initialIsOpen />
+            <ReactQueryDevtools initialIsOpen={true} />
+            <React.Suspense fallback={null}>
+                <ReactQueryDevtoolsProduction />
+            </React.Suspense>
         </QueryClientProvider>
     )
 }
